@@ -5,11 +5,17 @@ public class Main {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		Sudoku sudoku = new Sudoku();
-		sudoku.fillSudoku("C:\\Users\\ze_le\\Documents\\TrabalhoCana\\sudokuQuestions\\s01c.txt");
+		sudoku.fillSudoku(args[1]);
 
-		if (sudoku.solve()) 
-			sudoku.showSudokuBoard();
-//		sudoku.showPossiblities();
+		if(args[0].equals("1")) {
+			if(sudoku.solveMethod1() && sudoku.saveSolvedSudoku(args[2])) {
+				System.out.println("Arquivo criado com sucesso!");
+			}
+		} else if(args[0].equals("2")) {
+			if(sudoku.solveMethod2() && sudoku.saveSolvedSudoku(args[2])) {
+				System.out.println("Arquivo criado com sucesso!");
+			}
+		}
 	}
 
 }

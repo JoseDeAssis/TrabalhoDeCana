@@ -10,9 +10,9 @@ public class Sudoku {
 	private Cell[][] sudoku;
 
 	public Sudoku() {
-		this.sudoku = new Cell[COLUMN][ROW];
-		for (int col = 0; col < COLUMN; col++) {
-			for (int row = 0; row < ROW; row++) {
+		this.sudoku = new Cell[ROW][COLUMN];
+		for (int row = 0; row < ROW; row++) {
+			for (int col = 0; col < COLUMN; col++) {
 				sudoku[col][row] = new Cell();
 			}
 		}
@@ -20,26 +20,50 @@ public class Sudoku {
 
 	public void fillSudoku(String path) {
 		try {
-			FileReader file = new FileReader(path);
-			Scanner lerArquivo = new Scanner(file);
-			int col = 0;
+			FileReader fr = new FileReader(path);
+			Scanner lerArquivo = new Scanner(fr);
+			int row = 0;
 
-			while (lerArquivo.hasNextLine() && col < 9) {
+			while (lerArquivo.hasNextLine() && row < 9) {
 				for (int i = 0; i < 9; i++) {
-					sudoku[col][i].addCellNumber(lerArquivo.nextInt());
+					sudoku[i][row].addCellNumber(lerArquivo.nextInt());
 				}
-				col++;
+				row++;
 			}
 
 			lerArquivo.close();
+			fr.close();
 		} catch (IOException e) {
-			System.out.printf("Erro na abertura do arquivo: %s.\n", e.getMessage());
+			System.out.println("Erro na abertura do arquivo: " + e.getMessage());
 		}
 
 	}
 
+	public boolean saveSolvedSudoku(String path) {
+		try {
+			FileWriter arq = new FileWriter(path);
+			BufferedWriter buffWrite = new BufferedWriter(arq);
+			
+			for(int row = 0; row < ROW; row++) {
+				for(int col = 0; col < COLUMN; col++) {
+					String cell = sudoku[col][row] + " ";
+					buffWrite.append(cell);
+				}
+				buffWrite.append("\n");
+			}
+
+			buffWrite.close();
+			arq.close();
+		} catch (IOException e) {
+			System.out.println("Erro na criação do arquivo: " + e.getMessage());
+			return false;
+		} 
+		
+		return true;
+	}
+
 	public boolean isInRow(int row, int number) {
-		for (int i = 0; i < ROW; i++) {
+		for (int i = 0; i < COLUMN; i++) {
 			if (sudoku[i][row].getCellNumber() == number) {
 				return true;
 			}
@@ -49,7 +73,7 @@ public class Sudoku {
 	}
 
 	public boolean isInColumn(int column, int number) {
-		for (int i = 0; i < COLUMN; i++) {
+		for (int i = 0; i < ROW; i++) {
 			if (sudoku[column][i].getCellNumber() == number) {
 				return true;
 			}
@@ -73,18 +97,18 @@ public class Sudoku {
 		return false;
 	}
 
-	private boolean isOk(int row, int column, int number) {
+	private boolean isOkForSolve1(int row, int column, int number) {
 		return !isInRow(row, number) && !isInColumn(column, number) && !isInSubGrade(row, column, number);
 	}
 
-	public boolean solve() {
-		for (int col = 0; col < ROW; col++) {
-			for (int row = 0; row < COLUMN; row++) {
+	public boolean solveMethod1() {
+		for (int row = 0; row < ROW; row++) {
+			for (int col = 0; col < COLUMN; col++) {
 				if (sudoku[col][row].getCellNumber() == EMPTY) {
 					for (int number = 1; number < 10; number++) {
-						if (isOk(row, col, number)) {
+						if (isOkForSolve1(row, col, number)) {
 							sudoku[col][row].addCellNumber(number);
-							if (solve()) {
+							if (solveMethod1()) {
 								return true;
 							} else {
 								sudoku[col][row].removeCellNumber();
@@ -102,29 +126,10 @@ public class Sudoku {
 		for (int row = 0; row < ROW; row++) {
 			System.out.print("| ");
 			for (int col = 0; col < COLUMN; col++) {
-				System.out.print(sudoku[row][col].getCellNumber() + " | ");
+				System.out.print(sudoku[col][row].getCellNumber() + " | ");
 			}
 			System.out.println();
 			System.out.println("-------------------------------------");
-		}
-	}
-
-	public void verifySolve() {
-		for (int i = 0; i < 9; i++) {
-			int isInCol = 0;
-			int isInRow = 0;
-			for (int row = 0; row < 9; row++) {
-				if (sudoku[i][row].getCellNumber() == i)
-					isInCol++;
-				if (isInCol > 1)
-					System.out.println("deu ruim na coluna " + i);
-			}
-			for (int col = 0; col < 9; col++) {
-				if (sudoku[col][i].getCellNumber() == i)
-					isInRow++;
-				if (isInRow > 1)
-					System.out.println("deu ruim na linha " + i);
-			}
 		}
 	}
 
@@ -137,7 +142,7 @@ public class Sudoku {
 	}
 
 	public boolean couldBeInRow(int row, int number) {
-		for (int col = 0; col < ROW; col++) {
+		for (int col = 0; col < COLUMN; col++) {
 			if (sudoku[col][row].getCellNumber() == number)
 				return false;
 		}
@@ -164,8 +169,8 @@ public class Sudoku {
 	}
 
 	private void analyseSudoku() {
-		for (int col = 0; col < ROW; col++) {
-			for (int row = 0; row < COLUMN; row++) {
+		for (int row = 0; row < COLUMN; row++) {
+			for (int col = 0; col < ROW; col++) {
 				if (sudoku[col][row].getCellNumber() == EMPTY) {
 					for (int number = 1; number < 10; number++) {
 						if (isOkForSolve2(row, col, number)) {
@@ -177,15 +182,14 @@ public class Sudoku {
 		}
 	}
 
-	public boolean solveMethod2() {
-		analyseSudoku();
-		for (int col = 0; col < ROW; col++) {
-			for (int row = 0; row < COLUMN; row++) {
+	private boolean method2() {
+		for (int row = 0; row < ROW; row++) {
+			for (int col = 0; col < COLUMN; col++) {
 				if (sudoku[col][row].getCellNumber() == EMPTY) {
-					for (int number = 1; number < 10; number++) {
-						if (isOk(row, col, number)) {
-							sudoku[col][row].addCellNumber();
-							if (solve()) {
+					for (int number = 0; number < sudoku[col][row].getListPossibleNumbers().size(); number++) {
+						if (isOkForSolve2(row, col, sudoku[col][row].getListPossibleNumbers().get(number))) {
+							sudoku[col][row].addPossibleCellNumber(number);
+							if (method2()) {
 								return true;
 							} else {
 								sudoku[col][row].removeCellNumber();
@@ -198,18 +202,10 @@ public class Sudoku {
 		}
 		return true;
 	}
-	
-	public void showPossiblities() {
+
+	public boolean solveMethod2() {
 		analyseSudoku();
-		for(int col = 0; col < COLUMN; col++) {
-			for(int row = 0; row < ROW; row++) {
-				for(Integer number: sudoku[col][row].getListPossibleNumbers()) {
-					System.out.print(number);
-				}
-				System.out.print(" | ");
-			}
-			System.out.println();
-		}
+		return method2();
 	}
 
 }

@@ -23,8 +23,8 @@ public class Cell {
 		this.listPossibleNumbers.add(number);
 	}
 	
-	public void addCellNumber() {
-		this.cellNumber = listPossibleNumbers.get(0);
+	public void addPossibleCellNumber(int index) {
+		this.cellNumber = listPossibleNumbers.get(index);
 	}
 	
 	public void addCellNumber(int number) {
@@ -33,9 +33,6 @@ public class Cell {
 	
 	public void removeCellNumber() {
 		this.cellNumber = 0;
-		
-		if(!this.listPossibleNumbers.isEmpty())
-			this.listPossibleNumbers.remove(0);
 	}
 	
 }
