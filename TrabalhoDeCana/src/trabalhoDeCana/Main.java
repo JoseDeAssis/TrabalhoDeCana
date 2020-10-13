@@ -16,6 +16,7 @@ public class Main {
 				System.out.println("Arquivo criado com sucesso!");
 			}
 		}
+		System.out.println("Programa rodou em " + (sudoku.getTempoFinal() - sudoku.getTempoInicial()) + " milisegundos");
 	}
 
 }

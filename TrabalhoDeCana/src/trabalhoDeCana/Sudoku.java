@@ -8,6 +8,7 @@ public class Sudoku {
 	private static final int COLUMN = 9;
 	private static final int EMPTY = 0;
 	private Cell[][] sudoku;
+	private long tempoInicial, tempoFinal;
 
 	public Sudoku() {
 		this.sudoku = new Cell[ROW][COLUMN];
@@ -17,9 +18,18 @@ public class Sudoku {
 			}
 		}
 	}
+	
+	public long getTempoInicial() {
+		return this.tempoInicial;
+	}
+	
+	public long getTempoFinal() {
+		return this.tempoFinal;
+	}
 
 	public void fillSudoku(String path) {
 		try {
+			tempoInicial = System.currentTimeMillis();
 			FileReader fr = new FileReader(path);
 			Scanner lerArquivo = new Scanner(fr);
 			int row = 0;
@@ -46,8 +56,7 @@ public class Sudoku {
 			
 			for(int row = 0; row < ROW; row++) {
 				for(int col = 0; col < COLUMN; col++) {
-					String cell = sudoku[col][row] + " ";
-					buffWrite.append(cell);
+					buffWrite.append(sudoku[col][row].getCellNumber() + " ");
 				}
 				buffWrite.append("\n");
 			}
@@ -115,10 +124,13 @@ public class Sudoku {
 							}
 						}
 					}
+					this.tempoFinal = System.currentTimeMillis();
 					return false;
 				}
 			}
 		}
+		
+		this.tempoFinal = System.currentTimeMillis();
 		return true;
 	}
 
@@ -196,10 +208,13 @@ public class Sudoku {
 							}
 						}
 					}
+					this.tempoFinal = System.currentTimeMillis();
 					return false;
 				}
 			}
 		}
+		
+		this.tempoFinal = System.currentTimeMillis();
 		return true;
 	}
 
